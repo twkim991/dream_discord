@@ -1,7 +1,6 @@
 import discord, asyncio
 import yt_dlp as youtube_dl
 from discord.ext import commands
-from dico_token import Token
 import urllib
 import json
 import re
@@ -10,28 +9,6 @@ asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
  
 app = commands.Bot(command_prefix='!',intents=discord.Intents.all())
  
-youtube_dl.utils.bug_reports_message = lambda: ''
-
-ytdl_format_options = {
-    'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0',  # bind to ipv4 since ipv6 addresses cause issues sometimes
-}
- 
-ffmpeg_options = {
-    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-    'options': '-vn',
-}
- 
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 @app.event
 async def on_ready():
@@ -121,4 +98,4 @@ async def out(ctx):
         print(f"에러 발생: {not_found_channel}")
         await ctx.send("봇이 존재하는 채널을 찾는 데 실패했습니다.")
 
-app.run('MTE0NTMyOTE4Mjg2ODUyNTA5Ng.GP6ZCg.OJcx8DYpd7D4Pqbcd0YMzMYrGiRhZK4z2OeaCE')
+app.run('MTE0NTMyOTE4Mjg2ODUyNTA5Ng.GCdyYL.t5hYvpC9r9mj5atxXflkFrs6FtaEDTaTsk8IEg')
