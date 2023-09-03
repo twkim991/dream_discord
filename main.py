@@ -9,6 +9,7 @@ asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
  
 app = commands.Bot(command_prefix='!',intents=discord.Intents.all())
  
+TOKEN = 'MTE0NTMyOTE4Mjg2ODUyNTA5Ng.GrRHgR.ZX_Eybu_yhUcwGPrv-zVf3SYwTjExbmgWvt0zY'
 
 @app.event
 async def on_ready():
@@ -98,4 +99,4 @@ async def out(ctx):
         print(f"에러 발생: {not_found_channel}")
         await ctx.send("봇이 존재하는 채널을 찾는 데 실패했습니다.")
 
-app.run('MTE0NTMyOTE4Mjg2ODUyNTA5Ng.GCdyYL.t5hYvpC9r9mj5atxXflkFrs6FtaEDTaTsk8IEg')
+app.run(TOKEN)
