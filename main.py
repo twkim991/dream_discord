@@ -4,12 +4,12 @@ from discord.ext import commands
 import urllib
 import json
 import re
+from discord_token.py import TOKEN
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
  
 app = commands.Bot(command_prefix='!',intents=discord.Intents.all())
  
-TOKEN = 'MTE0NTMyOTE4Mjg2ODUyNTA5Ng.GrRHgR.ZX_Eybu_yhUcwGPrv-zVf3SYwTjExbmgWvt0zY'
 
 @app.event
 async def on_ready():
