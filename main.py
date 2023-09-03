@@ -4,7 +4,9 @@ from discord.ext import commands
 import urllib
 import json
 import re
-from discord_token.py import TOKEN
+import bs4
+from selenium import webdriver
+from discord_token import TOKEN
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
  
@@ -18,14 +20,61 @@ async def on_ready():
 
 @app.event
 async def on_message(message):
+    searchYoutubeHref={} # 유튜브 하이퍼링크 모음
     p = re.compile('^!..번역')
     language = [['한','영','일','중','서'], ['ko','en','ja','zh-CN','es']]
     if message.author == app.user:
         await app.process_commands(message)
         return
 
-    if message.content.startswith('아~ 야스하고싶다~'):
-        await message.channel.send('큰소리로 말하지 마 병신아')
+    if message.content.startswith('!검색'):
+        Text = ""
+        learn = message.content.split(" ")
+        vrsize = len(learn)  # 배열크기
+        vrsize = int(vrsize)
+        for i in range(1, vrsize):  # 띄어쓰기 한 텍스트들 인식함
+            Text = Text + " " + learn[i]
+        encText = Text
+
+
+        driver = webdriver.Chrome()
+        driver.get('https://www.youtube.com/results?search_query='+encText) #유튜브 검색링크
+        source = driver.page_source
+        bs = bs4.BeautifulSoup(source, 'lxml')
+        entire = bs.find_all('a', {'id': 'video-title'}) # a태그에서 video title 이라는 id를 찾음
+
+        embed = discord.Embed(
+            title="영상들!",
+            description="검색한 영상 결과",
+            colour=discord.Color.blue())
+
+        for i in range(0, 5):
+            entireNum = entire[i]
+            entireText = entireNum.text.strip()  # 영상제목
+            print(entireText)
+            test1 = entireNum.get('href')  # 하이퍼링크
+            print(test1)
+            rink = 'https://www.youtube.com'+test1
+            embed.add_field(name=str(i + 1) + '번째 영상', value='\n' + '[%s](<%s>)' % (entireText, rink),
+                            inline=False)  # [텍스트](<링크>) 형식으로 적으면 텍스트 하이퍼링크 만들어집니다
+            searchYoutubeHref[i] = rink
+        await message.channel.send(embed=embed)
+    
+    if message.content.startswith('!재생 '):
+        print('숫자로 말하면 검색한 결과 5개중에 하나 선택, 링크를 주면 해당 링크 재생목록에 넣고 재생')
+
+    if message.content.startswith('!재생목록'):
+        print('재생목록에 뭐가 들어있는지 확인시켜줌')
+
+    if message.content.startswith('!재생목록 제거'):
+        print('숫자로 말하면 재생목록에서 해당 번호의 노래를 제거함')
+
+    if message.content.startswith('!재생방식 선택'):
+        print('숫자로 말하면 노래를 한바퀴돌면 끝낼지/끝에서처음으로돌아가는지/랜덤으로돌아가는지 정함')
+
+    if message.content.startswith('!주간인기곡'):
+    print('웹크롤링으로 주간인기곡 가져와서 재생시켜줌')
+
 
     
     if (p.match(message.content)) != None:
