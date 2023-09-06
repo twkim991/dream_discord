@@ -212,11 +212,22 @@ class Music(commands.Cog):
     async def remove(self, ctx, *, num):
         """플레이리스트에서 특정 노래를 제거함"""
         try:
-            del playlist(num)
+            del playlist[num]
             await ctx.send(f"플레이리스트에서 {num}번 곡을 제거하였습니다.")
         except:
             await print("add error")
  
+    @commands.command()
+    async def help(self, ctx):
+        """명령어 목록을 유저한테 보여줌"""
+        try:
+            embed = discord.Embed(title="봇을 케이크처럼 쉽게 다루는 법", description='명령어 목록은 다음과 같습니다.', color=discord.Color.green())
+            embed.add_field(name='ㅡㅡㅡㅡㅡㅡㅡㅡ번역 관련 명령어ㅡㅡㅡㅡㅡㅡㅡㅡ', value='\n저희 봇은 현재 한국어, 영어, 일본어, 중국어, 스페인어의 총 5가지 언어의 번역을 제공합니다.\n각각 한 영 일 중 서로 키워드되며 번역하고 싶은 방식에 맞춰 "!XX번역"이라고 한 다음 번역하고싶은 문장을 뒤에 넣으면 봇이 해당 문장을 번역해드립니다.\n(ex: !한영번역 안녕하세요)\n', inline=False)
+            embed.add_field(name='ㅡㅡㅡㅡㅡㅡㅡㅡ노래 관련 명령어ㅡㅡㅡㅡㅡㅡㅡㅡ', value='\n노래 관련 기능을 사용하려면 기본적으로 명령어를 입력하려는 사용자가 음성 채널에 존재하는 상태여야 합니다. 먼저 음성 채널에 들어간 다음 명령어를 사용해주세요.\n\n**!검색** \n 뒤에 검색하고 싶은 문구를 덧붙이면 유튜브에서 해당 문구를 검색하여 최상단에 나오는 5개의 결과를 보여줍니다.(ex: !검색 애국가)\n\n**!select** \n 뒤에 검색한 결과 중 선택하고 싶은 검색결과를 선택하면 해당 번호의 노래를 재생합니다.(ex: !select 3)\n선택한 노래는 자동으로 플레이리스트의 첫번째에 추가됩니다.\n\n**!play** \n뒤에 번호를 지정하면 플레이리스트에서 선택한 번호의 노래를 재생합니다.(ex: !play 1)\n\n**!stream** \n 뒤에 유튜브 링크를 덧붙이면 해당 링크의 노래를 재생합니다.(ex: !stream https://www.youtube.com/watch?v=XrnQgWzsRVQ)\n선택한 노래는 자동으로 플레이리스트의 첫번째에 추가됩니다.\n\n**!volume** \n 뒤에 원하는 퍼센트를 덧붙이면 노래의 볼륨을 조절합니다.(ex: !volume 50)\n기본 볼륨은 100입니다.\n\n**!stop** \n 노래 재생을 중지하고 봇을 현재 음성 채널에서 쫒아냅니다.\n\n**!loop** \n 플레이리스트의 마지막 노래까지 재생한다음 루프를 반복할지 그냥 노래 재생이 끝나게 할지를 정합니다.\n기본 상태에서는 루프를 반복합니다.\n\n**!playlist** \n 현재 플레이리스트에 존재하는 모든 곡을 보여줍니다.\n\n**!remove** \n 뒤에 번호를 지정하면 플레이리스트에서 선택한 번호의 노래를 삭제합니다.(ex: !remove 0)', inline=False)
+            await ctx.send(embed=embed)
+        except:
+            await print("help error")
+
     @play.before_invoke
     @stream.before_invoke
     async def ensure_voice(self, ctx):
@@ -238,6 +249,7 @@ bot = commands.Bot(
     command_prefix=commands.when_mentioned_or("!"),
     description='Relatively simple music bot example',
     intents=intents,
+    help_command=None,
 )
  
  
