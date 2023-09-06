@@ -39,7 +39,7 @@ ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 searchYoutubeHref={} # 검색결과 저장장소
 playlist=[] # 노래 재생목록
- 
+
  
 # youtube 음악과 로컬 음악의 재생을 구별하기 위한 클래스 작성.
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -63,12 +63,15 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
  
- 
+
+
+
+
 # 음악 재생 클래스. 커맨드 포함.
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
- 
+
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         """보이스 채널에 봇을 입장시킴"""
@@ -79,28 +82,89 @@ class Music(commands.Cog):
         await channel.connect()
  
     @commands.command()
-    async def play(self, ctx, *, query):
+    async def select(self, ctx, *, query):
         """검색기능을 이용한 노래 재생"""
-
-        number = int(query)
-        select_song = searchYoutubeHref[number-1]
-        playlist.append(select_song)
-        async with ctx.typing():
-            player = await YTDLSource.from_url(select_song, loop=self.bot.loop, stream=True)
-            ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
-        await ctx.send(f'Now playing: {player.title}')
+        try:
+            number = int(query)
+            select_song = searchYoutubeHref[number-1]
+            playlist.insert(0, select_song)
+            i = 0
+            while True:
+                async with ctx.typing():
+                    player = await YTDLSource.from_url(playlist[0], loop=self.bot.loop, stream=True)
+                    ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
+                await ctx.send(f'Now playing: {player.title}')
+                while ctx.voice_client.is_playing():
+                    await asyncio.sleep(0.1)
+                if loop:
+                    if i < len(playlist) - 1:
+                        i = i + 1
+                    else:
+                        i = 0
+                    continue
+                elif i < len(playlist) - 1:
+                    i = i + 1
+                    continue
+                break
+        except:
+            print('play error')
+            return
  
+    @commands.command()
+    async def play(self, ctx, *, query):
+        """플레이리스트에 있는 노래 재생"""
+        try:
+            number = int(query)
+            select_song = playlist[number-1]
+            i = 0
+            while True:
+                async with ctx.typing():
+                    player = await YTDLSource.from_url(playlist[0], loop=self.bot.loop, stream=True)
+                    ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
+                await ctx.send(f'Now playing: {player.title}')
+                while ctx.voice_client.is_playing():
+                    await asyncio.sleep(0.1)
+                if loop:
+                    if i < len(playlist) - 1:
+                        i = i + 1
+                    else:
+                        i = 0
+                    continue
+                elif i < len(playlist) - 1:
+                    i = i + 1
+                    continue
+                break
+        except:
+            print('play error')
+            return
  
     @commands.command()
     async def stream(self, ctx, *, url):
         """url을 이용한 노래 재생"""
- 
-        playlist.append(url)
-        async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-            ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
-        await ctx.send(f'Now playing: {player.title}')
- 
+        try:
+            playlist.insert(0, url)
+            i = 0
+            while True:
+                async with ctx.typing():
+                    player = await YTDLSource.from_url(playlist[0], loop=self.bot.loop, stream=True)
+                    ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
+                await ctx.send(f'Now playing: {player.title}')
+                while ctx.voice_client.is_playing():
+                    await asyncio.sleep(0.1)
+                if loop:
+                    if i < len(playlist) - 1:
+                        i = i + 1
+                    else:
+                        i = 0
+                    continue
+                elif i < len(playlist) - 1:
+                    i = i + 1
+                    continue
+                break
+        except:
+            print('stream error')
+            return
+    
     @commands.command()
     async def volume(self, ctx, volume: int):
         """볼륨 변경"""
@@ -116,6 +180,20 @@ class Music(commands.Cog):
         """노래를 멈추고 보이스채널에서 봇을 쫒아냄"""
  
         await ctx.voice_client.disconnect()
+
+    @commands.command()
+    async def loop(self, ctx):
+        """노래의 루프 기능을 끄거나 킴"""
+        try:
+            global loop
+            loop = True
+            if loop == False:
+                loop = True
+            else:
+                loop = False
+            await ctx.send(f"현재 LOOP 상태: {loop}")
+        except:
+            await print("loop error")
  
     @play.before_invoke
     @stream.before_invoke
