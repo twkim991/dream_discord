@@ -39,7 +39,8 @@ ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 searchYoutubeHref={} # 검색결과 저장장소
 playlist=[] # 노래 재생목록
-
+global loop
+loop = True
  
 # youtube 음악과 로컬 음악의 재생을 구별하기 위한 클래스 작성.
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -144,6 +145,8 @@ class Music(commands.Cog):
         try:
             playlist.insert(0, url)
             i = 0
+            global loop
+            print(loop)
             while True:
                 async with ctx.typing():
                     player = await YTDLSource.from_url(playlist[0], loop=self.bot.loop, stream=True)
@@ -186,7 +189,6 @@ class Music(commands.Cog):
         """노래의 루프 기능을 끄거나 킴"""
         try:
             global loop
-            loop = True
             if loop == False:
                 loop = True
             else:
@@ -194,6 +196,26 @@ class Music(commands.Cog):
             await ctx.send(f"현재 LOOP 상태: {loop}")
         except:
             await print("loop error")
+
+    @commands.command()
+    async def playlist(self, ctx):
+        """플레이리스트에 있는 노래 목록을 보여줌"""
+        try:
+            message = ""
+            for i in range(len(playlist)):
+                message = message + f'{i}' + ': ' + playlist[i] + '\n'
+            await ctx.send(f"{message}")
+        except:
+            await print("playlist error")
+
+    @commands.command()
+    async def remove(self, ctx, *, num):
+        """플레이리스트에서 특정 노래를 제거함"""
+        try:
+            del playlist(num)
+            await ctx.send(f"플레이리스트에서 {num}번 곡을 제거하였습니다.")
+        except:
+            await print("add error")
  
     @play.before_invoke
     @stream.before_invoke
