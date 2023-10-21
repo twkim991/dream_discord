@@ -92,7 +92,9 @@ class Music(commands.Cog):
             i = 0
             while True:
                 async with ctx.typing():
+                    print(playlist[0])
                     player = await YTDLSource.from_url(playlist[0], loop=self.bot.loop, stream=True)
+                    print(player)
                     ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
                 await ctx.send(f'Now playing: {player.title}')
                 while ctx.voice_client.is_playing():
@@ -107,8 +109,9 @@ class Music(commands.Cog):
                     i = i + 1
                     continue
                 break
-        except:
+        except Exception as e:
             print('play error')
+            print(e)
             return
  
     @commands.command()
@@ -228,6 +231,7 @@ class Music(commands.Cog):
         except:
             await print("help error")
 
+    @select.before_invoke
     @play.before_invoke
     @stream.before_invoke
     async def ensure_voice(self, ctx):
